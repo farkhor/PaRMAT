@@ -1,7 +1,7 @@
 PaRMAT
 ======
 
-PaRMAT is a multi-threaded large-scale RMAT graph generator. Using PaRMAT, you can create very very large synthetic directed or undirected RMAT graphs. With PaRMAT, you can allow or disallow existence of duplicate edges or edges having the same source and destination vertices. PaRMAT is designed to exploit multiple threads and to avoid failing when there is not a lot of memory (RAM) available.
+PaRMAT is a multi-threaded RMAT graph generator. Using PaRMAT, you can create very large directed or undirected RMAT graphs. PaRMAT is designed to exploit multiple threads and to avoid failing when there is not a lot of memory (RAM) available.
 
 
 A little bit of background
