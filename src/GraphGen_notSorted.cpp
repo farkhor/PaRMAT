@@ -37,7 +37,7 @@ void fill_up_edge_vector( Square& rec,
 
 			// Detection of Invalid edges.
 			for( unsigned long long edgeIdx = 0; edgeIdx < (edgeVector.size()-1); ++edgeIdx )
-				if( (!allowDuplicateEdges) && (edgeVector.at(edgeIdx) == edgeVector.at(edgeIdx+1)))
+				if( edgeVector.at(edgeIdx) == edgeVector.at(edgeIdx+1) )
 					throwAwayEdgesIndices.push_back(edgeIdx);
 
 			// Add instead of eliminated and check until generate enough.
