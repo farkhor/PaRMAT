@@ -99,7 +99,6 @@ bool GraphGen_sorted::GenerateGraph(	const unsigned long long nEdges,
 			ShatterSquare(squares, RMAT_a, RMAT_b, RMAT_c, 0, directedGraph);
 		std::sort( squares.begin(), squares.end() );
 	}
-	std::cout << "cols: " << Get_N_Columns(squares) << "\n" << squares.size() << "\n" ;
 
 	std::vector< std::vector<Square> > rectagnleVecs;
 	unsigned long long colIdx = 0;

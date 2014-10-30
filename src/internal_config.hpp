@@ -18,7 +18,7 @@
 #define MAX_RAM_PORTION_USAGE 0.9
 
 #define SHOW_PROGRESS_BARS
-#define SHOW_SQUARES_DETAILS
+//#define SHOW_SQUARES_DETAILS
 
 //#define USE_FUTURES_INSTEAD_OF_EXPLICIT_THREADS								// Enabling it makes the sorted output get created by "futures" instead of using explicit threads.
 //#define USE_A_MUTEX_TO_CONTROL_WRITE_TO_FILE_INSTEAD_OF_CONCURRENT_QUEUES		// Enabling it makes the non-sorted output get created by a mutex, that controls the exclusiveness of the writes to file, instead of using concurrent queues.
