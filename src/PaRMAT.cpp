@@ -103,7 +103,7 @@ int main( int argc, char ** argv ) {
 			openFileToWrite( outf, "out.txt" );
 
 		if( nCPUWorkerThreads == 0 ) {	// If number of concurrent threads haven't specified by the user,
-			nCPUWorkerThreads = std::thread::hardware_concurrency();	// try to manage their numbers automatically.
+			nCPUWorkerThreads = std::thread::hardware_concurrency() - 1;	// try to manage their numbers automatically.
 			if( nCPUWorkerThreads == 0 )	// If cannot determine,
 				nCPUWorkerThreads = 1;	// go single-threaded.
 		}
