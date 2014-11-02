@@ -4,6 +4,7 @@
 #include <fstream>
 #include <stdexcept>
 #include <thread>
+#include <algorithm>
 #include <cstdlib>
 
 #include "GraphGen_sorted.hpp"
@@ -102,11 +103,8 @@ int main( int argc, char ** argv ) {
 		if( !outf.is_open() )
 			openFileToWrite( outf, "out.txt" );
 
-		if( nCPUWorkerThreads == 0 ) {	// If number of concurrent threads haven't specified by the user,
-			nCPUWorkerThreads = std::thread::hardware_concurrency() - 1;	// try to manage their numbers automatically.
-			if( nCPUWorkerThreads == 0 )	// If cannot determine,
-				nCPUWorkerThreads = 1;	// go single-threaded.
-		}
+		if( nCPUWorkerThreads == 0 )	// If number of concurrent threads haven't specified by the user,
+			nCPUWorkerThreads = std::max( 1, static_cast<int>(std::thread::hardware_concurrency()) - 1 );	// try to manage their numbers automatically. If cannot determine, go single-threaded.
 
 		// Print the info.
 		std::cout << "Requested graph will have " << nEdges << " edges and " << nVertices << " vertices." << "\n" <<
