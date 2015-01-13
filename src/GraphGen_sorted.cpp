@@ -123,7 +123,7 @@ bool GraphGen_sorted::GenerateGraph(	const unsigned long long nEdges,
 				std::cout << s;
 	#endif
 
-	std::cout << rectagnleVecs.size() << " columns(s) specified.\n" << "Generating the graph ...\n";
+	std::cout << rectagnleVecs.size() << " rectangle(s) specified.\n" << "Generating the graph ...\n";
 
 	// Each thread pushes generated edges into a vector.
 	std::vector< std::vector<Edge> > threads_edges(nCPUWorkerThreads);
