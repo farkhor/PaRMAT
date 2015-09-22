@@ -23,17 +23,19 @@ public:
 	// Adds to the existing capacity in a thread-safe manner.
 	void accumulate( intT thisMuch ){
 		std::unique_lock<std::mutex> accumulate_mutex(capacity_mutex);
-		dissipated_cond.wait(accumulate_mutex,[&]{	intT sum = accumulated + thisMuch;
-													bool ret = ( sum < max_capacity );
-													if(ret)
-														accumulated = sum;
-													return ret;});
+		dissipated_cond.wait( accumulate_mutex, [&]{
+			auto sum = accumulated + thisMuch;
+			auto ret = ( sum < max_capacity );
+			if( ret )
+				accumulated = sum;
+			return ret;
+		} );
 	}
 
 	// Deducts from the existing capacity in a thread-safe manner.
 	void dissipate( intT thisMuch ){
 		{
-			std::lock_guard<std::mutex> dissipate_mutex(capacity_mutex);
+			std::lock_guard<std::mutex> dissipate_mutex( capacity_mutex );
 			accumulated -= thisMuch;
 		}
 		dissipated_cond.notify_all();

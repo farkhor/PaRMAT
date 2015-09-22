@@ -30,20 +30,20 @@ Square& Square::operator=( const Square &cSource ) {
 
 Square Square::Get_part( const unsigned int part, double a, double b, double c, double a_edge_share, double b_edge_share, double c_edge_share ) {
 
-	unsigned long long x_start_i = ( part == 0 || part == 2 ) ? X_start : ((X_start+X_end)>>1) ;
-	unsigned long long x_end_i   = ( part == 1 || part == 3 ) ? X_end	: ((X_start+X_end)>>1) ;
-	unsigned long long y_start_i = ( part == 0 || part == 1 ) ? Y_start : ((Y_start+Y_end)>>1) ;
-	unsigned long long y_end_i   = ( part == 2 || part == 3 ) ? Y_end	: ((Y_start+Y_end)>>1) ;
+	auto x_start_i = ( part == 0 || part == 2 ) ? X_start : ((X_start+X_end)>>1) ;
+	auto x_end_i   = ( part == 1 || part == 3 ) ? X_end	: ((X_start+X_end)>>1) ;
+	auto y_start_i = ( part == 0 || part == 1 ) ? Y_start : ((Y_start+Y_end)>>1) ;
+	auto y_end_i   = ( part == 2 || part == 3 ) ? Y_end	: ((Y_start+Y_end)>>1) ;
 
-	double d_edge_share = 1.0 - a_edge_share - b_edge_share - c_edge_share;
+	auto d_edge_share = 1.0 - a_edge_share - b_edge_share - c_edge_share;
 
 	unsigned long long new_nEdges= 	(part==0) ? a_edge_share * nEdgeToGenerate :
 									(part==1) ? b_edge_share * nEdgeToGenerate :
 									(part==2) ? c_edge_share * nEdgeToGenerate :
 												d_edge_share * nEdgeToGenerate ;
-	unsigned long long new_level = level+1;
-	unsigned long long new_index_h = (recIndex_horizontal<<1) +	((part==0 || part==2) ? 0 : 1);
-	unsigned long long new_index_v = (recIndex_vertical<<1)   +	((part==0 || part==1) ? 0 : 1);
+	auto new_level = level+1;
+	auto new_index_h = ( recIndex_horizontal << 1 ) +	( ( part == 0 || part == 2 ) ? 0 : 1 );
+	auto new_index_v = ( recIndex_vertical << 1 )   +	( ( part == 0 || part == 1 ) ? 0 : 1 );
 
 	return Square( x_start_i, x_end_i, y_start_i, y_end_i, new_nEdges, new_level, new_index_h, new_index_v );
 }

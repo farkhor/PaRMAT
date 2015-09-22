@@ -44,7 +44,7 @@ all: PaRMAT
 PaRMAT: $(OBJS) $(USER_OBJS)
 	@echo 'Building target: $@'
 	@echo 'Invoking: GCC C++ Linker'
-	g++  -o "PaRMAT" $(OBJS) $(USER_OBJS) $(LIBS)
+	g++ -pthread -o "PaRMAT" $(OBJS) $(USER_OBJS) $(LIBS)
 	@echo 'Finished building target: $@'
 	@echo ' '
 

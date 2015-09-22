@@ -17,15 +17,15 @@ Edge& Edge::operator= (const Edge &cSource) {
 }
 
 bool Edge::selfEdge(){
-	return (src==dst);
+	return ( src == dst );
 }
 
 bool operator< (const Edge& cR1, const Edge& cR2) {
-	if(cR1.src < cR2.src)
+	if( cR1.src < cR2.src )
 		return true;
-	else if(cR1.src > cR2.src)
+	else if( cR1.src > cR2.src )
 		return false;
-	else if(cR1.dst < cR2.dst)
+	else if( cR1.dst < cR2.dst )
 		return true;
 	else
 		return false;

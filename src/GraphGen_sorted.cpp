@@ -14,10 +14,12 @@
 #include "utils.hpp"
 
 
-void EachThreadGeneratesEdges( std::vector<Square>& recs,
+void EachThreadGeneratesEdges(
+		std::vector<Square>& recs,
 		std::vector<Edge>& edgesVec,
 		const double RMAT_a, const double RMAT_b, const double RMAT_c,
-		const bool allowEdgeToSelf, const bool allowDuplicateEdges, const bool directedGraph ) {
+		const bool allowEdgeToSelf, const bool allowDuplicateEdges, const bool directedGraph
+		) {
 
 	// First clean the edge vector before adding any.
 	edgesVec.clear();
@@ -71,15 +73,17 @@ void EachThreadGeneratesEdges( std::vector<Square>& recs,
 
 }
 
-bool GraphGen_sorted::GenerateGraph(	const unsigned long long nEdges,
-							const unsigned long long nVertices,
-							const double RMAT_a, double RMAT_b, double RMAT_c,
-							const unsigned int nCPUWorkerThreads,
-							std::ofstream& outFile,
-							const unsigned long long standardCapacity,
-							const bool allowEdgeToSelf,
-							const bool allowDuplicateEdges,
-							const bool directedGraph ) {
+bool GraphGen_sorted::GenerateGraph(
+		const unsigned long long nEdges,
+		const unsigned long long nVertices,
+		const double RMAT_a, double RMAT_b, double RMAT_c,
+		const unsigned int nCPUWorkerThreads,
+		std::ofstream& outFile,
+		const unsigned long long standardCapacity,
+		const bool allowEdgeToSelf,
+		const bool allowDuplicateEdges,
+		const bool directedGraph
+		) {
 
 	std::vector<Square> squares ( 1, Square( 0, nVertices, 0, nVertices, nEdges, 0, 0, 0 ) );
 
@@ -117,18 +121,17 @@ bool GraphGen_sorted::GenerateGraph(	const unsigned long long nEdges,
 	}
 	rectagnleVecs.push_back( std::vector<Square>( iter, iter+colIdx ) );
 
-	#ifdef SHOW_SQUARES_DETAILS
-		for( auto& r: rectagnleVecs)
+	if( SHOW_SQUARES_DETAILS )
+		for( auto& r: rectagnleVecs )
 			for( auto& s: r )
 				std::cout << s;
-	#endif
 
 	std::cout << rectagnleVecs.size() << " rectangle(s) specified.\n" << "Generating the graph ...\n";
 
 	// Each thread pushes generated edges into a vector.
 	std::vector< std::vector<Edge> > threads_edges(nCPUWorkerThreads);
 
-	#ifdef USE_FUTURES_INSTEAD_OF_EXPLICIT_THREADS
+	if( USE_FUTURES_INSTEAD_OF_EXPLICIT_THREADS ) {
 
 		/*********************************
 		 * Multi-threading using futures.
@@ -144,10 +147,7 @@ bool GraphGen_sorted::GenerateGraph(	const unsigned long long nEdges,
 		for( ; recIdx < rectagnleVecs.size(); ++recIdx ) {
 			tasks_to_complete.at(0).get();
 			printEdgeGroup(std::ref(threads_edges[recIdx%nCPUWorkerThreads]), outFile);
-				#ifdef SHOW_PROGRESS_BARS
-					std::cout <<'|';
-					std::cout.flush();
-				#endif
+			progressBar();
 			tasks_to_complete.erase(tasks_to_complete.begin());
 			tasks_to_complete.push_back( std::async( std::launch::async, EachThreadGeneratesEdges,
 					std::ref(rectagnleVecs.at(recIdx)), std::ref(threads_edges[recIdx%nCPUWorkerThreads]),
@@ -159,17 +159,12 @@ bool GraphGen_sorted::GenerateGraph(	const unsigned long long nEdges,
 			task.get();
 			printEdgeGroup(std::ref(threads_edges[recIdx%nCPUWorkerThreads]), outFile);
 			++recIdx;
-			#ifdef SHOW_PROGRESS_BARS
-				std::cout <<'|';
-				std::cout.flush();
-			#endif
+			progressBar();
 		}
 
-		#ifdef SHOW_PROGRESS_BARS
-			std::cout << std::endl;
-		#endif
+		progressBarNewLine();
 
-	#else
+	} else {
 
 		/*********************************************
 		 * Multi-threading using threads explicitly.
@@ -189,10 +184,7 @@ bool GraphGen_sorted::GenerateGraph(	const unsigned long long nEdges,
 		for( ; recIdx < rectagnleVecs.size(); ++recIdx ) {
 			threads.at(0).join();
 			printEdgeGroup(std::ref(threads_edges[recIdx%nCPUWorkerThreads]), outFile);
-				#ifdef SHOW_PROGRESS_BARS
-					std::cout <<'|';
-					std::cout.flush();
-				#endif
+			progressBar();
 			threads.erase(threads.begin());
 			threads.push_back( std::thread( EachThreadGeneratesEdges,
 					std::ref(rectagnleVecs.at(recIdx)), std::ref(threads_edges[recIdx%nCPUWorkerThreads]), RMAT_a, RMAT_b, RMAT_c, allowEdgeToSelf, allowDuplicateEdges, directedGraph ) );
@@ -203,17 +195,12 @@ bool GraphGen_sorted::GenerateGraph(	const unsigned long long nEdges,
 			t.join();
 			printEdgeGroup(std::ref(threads_edges[recIdx%nCPUWorkerThreads]), outFile);
 			++recIdx;
-			#ifdef SHOW_PROGRESS_BARS
-				std::cout <<'|';
-				std::cout.flush();
-			#endif
+			progressBar();
 		}
 
-		#ifdef SHOW_PROGRESS_BARS
-			std::cout << std::endl;
-		#endif
+		progressBarNewLine();
 
-	#endif
+	}
 
 	return( EXIT_SUCCESS );
 

@@ -2,6 +2,7 @@
 #include <ctime>		// For std::time.
 #include <cstdlib>		// For std::rand.
 #include <functional>	// For std::ref.
+#include <iostream>		// For std::cout.
 
 #if defined(_WIN32)
 #include <Windows.h>
@@ -64,14 +65,14 @@ void ShatterSquare( std::vector<Square>& square, const double a, const double b,
 	std::srand(std::time(0));
 
 	// Noise for selecting a, b, c to cut square.
-	double noise_a = static_cast<double>(std::rand()-(RAND_MAX/2))/(RAND_MAX*100.0);	// Very small random noises. Maybe can be implemented in a better way. Up to one percent for each parameter.
-	double noise_b = static_cast<double>(std::rand()-(RAND_MAX/2))/(RAND_MAX*100.0);
-	double noise_c = static_cast<double>(std::rand()-(RAND_MAX/2))/(RAND_MAX*100.0);
+	auto noise_a = static_cast<double>(std::rand()-(RAND_MAX/2))/(RAND_MAX*100.0);	// Very small random noises. Maybe can be implemented in a better way. Up to one percent for each parameter.
+	auto noise_b = static_cast<double>(std::rand()-(RAND_MAX/2))/(RAND_MAX*100.0);
+	auto noise_c = static_cast<double>(std::rand()-(RAND_MAX/2))/(RAND_MAX*100.0);
 
 	// Noise for number of edges to be created by each sub-square.
-	double noise_a_edge_share = static_cast<double>(std::rand()-(RAND_MAX/2))/(RAND_MAX*100.0);	// Very small random noises. Maybe can be implemented in a better way. Up to one percent for each parameter.
-	double noise_b_edge_share = static_cast<double>(std::rand()-(RAND_MAX/2))/(RAND_MAX*100.0);
-	double noise_c_edge_share = static_cast<double>(std::rand()-(RAND_MAX/2))/(RAND_MAX*100.0);
+	auto noise_a_edge_share = static_cast<double>(std::rand()-(RAND_MAX/2))/(RAND_MAX*100.0);	// Very small random noises. Maybe can be implemented in a better way. Up to one percent for each parameter.
+	auto noise_b_edge_share = static_cast<double>(std::rand()-(RAND_MAX/2))/(RAND_MAX*100.0);
+	auto noise_c_edge_share = static_cast<double>(std::rand()-(RAND_MAX/2))/(RAND_MAX*100.0);
 
 	Square srcRect(square.at(index));
 	square.erase(square.begin()+index);
@@ -100,8 +101,8 @@ unsigned long long genEdgeIndex_FP( unsigned long long startIdx_ull, unsigned lo
 
 	double noise_a = 0, noise_b_or_c = 0, cutLine;
 	double cutIndex;
-	double startIdx = static_cast<double>(startIdx_ull);
-	double endIdx = static_cast<double>(endIdx_ull);
+	auto startIdx = static_cast<double>(startIdx_ull);
+	auto endIdx = static_cast<double>(endIdx_ull);
 	while( (endIdx - startIdx) >= 1.0 ) {
 	#ifdef ADD_NOISE_TO_RMAT_PARAMETERS_AT_EACH_LEVEL
 			noise_a = static_cast<double>(dis(gen)-(dis.max()/2.0))/(dis.max()*500.0);	// Much smaller noise. Maybe can be improved.
@@ -146,8 +147,8 @@ void generate_edges( Square& squ,
 		std::uniform_int_distribution<>& dis, std::mt19937_64& gen,
 		std::vector<unsigned long long>& duplicate_indices ) {
 
-	bool applyCondition = directedGraph || ( squ.get_H_idx() < squ.get_V_idx() ); // true: if the graph is directed or in case it is undirected, the square belongs to the lower triangle of adjacency matrix. false: the diagonal passes the rectangle and the graph is undirected.
-	bool createNewEdges = duplicate_indices.empty();
+	auto applyCondition = directedGraph || ( squ.get_H_idx() < squ.get_V_idx() ); // true: if the graph is directed or in case it is undirected, the square belongs to the lower triangle of adjacency matrix. false: the diagonal passes the rectangle and the graph is undirected.
+	auto createNewEdges = duplicate_indices.empty();
 	unsigned long long nEdgesToGen = createNewEdges ? squ.getnEdges() : duplicate_indices.size();
 	for( unsigned long long edgeIdx = 0; edgeIdx < nEdgesToGen; ) {
 		unsigned long long h_idx = genEdgeIndex_FP(squ.get_X_start(), squ.get_X_end(), RMAT_a, RMAT_c, std::ref(dis), std::ref(gen));
@@ -161,4 +162,16 @@ void generate_edges( Square& squ,
 		++edgeIdx;
 	}
 
+}
+
+void progressBar() {
+	if( SHOW_PROGRESS_BARS ) {
+		std::cout <<'|';
+		std::cout.flush();
+	}
+}
+
+void progressBarNewLine() {
+	if( SHOW_PROGRESS_BARS )
+		std::cout << std::endl;
 }

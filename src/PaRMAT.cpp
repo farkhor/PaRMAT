@@ -19,13 +19,14 @@ void openFileToWrite( std::ofstream& input_file, const char* file_name ) {
 		throw std::runtime_error( "Failed to open specified file." );
 }
 
-unsigned int determine_num_of_CPU_worker_thread( const int suggested ) {
+template <typename intT>
+intT determine_num_of_CPU_worker_thread( const intT suggested ) {
 	if( suggested < MIN_CPU_WORKER_THREAD )
-		return static_cast<unsigned int>(MIN_CPU_WORKER_THREAD);
+		return static_cast<intT>( MIN_CPU_WORKER_THREAD );
 	else if( suggested > MAX_CPU_WORKER_THREAD )
-		return static_cast<unsigned int>(MAX_CPU_WORKER_THREAD);
+		return static_cast<intT>( MAX_CPU_WORKER_THREAD );
 	else
-		return static_cast<unsigned int>(suggested);
+		return static_cast<intT>( suggested );
 }
 
 double determine_RAM_usage( const double suggested ) {
@@ -116,8 +117,8 @@ int main( int argc, char ** argv ) {
 				"Specified graph may" << (allowDuplicateEdges?" ":" NOT ") << "contain duplicate edges." << "\n" <<
 				"Specified graph will be " << (directedGraph?"DIRECTED.":"UNDIRECTED.") << "\n";
 
-		unsigned long long totalSystemRAM = static_cast<unsigned long long>(getTotalSystemMemory());	// In bytes.
-		unsigned long long availableSystemRAM = calculateAvailableRAM( totalSystemRAM, RAM_usage );	// In bytes.
+		auto totalSystemRAM = static_cast<unsigned long long>(getTotalSystemMemory());	// In bytes.
+		auto availableSystemRAM = calculateAvailableRAM( totalSystemRAM, RAM_usage );	// In bytes.
 
 		standardCapacity = availableSystemRAM / (2*nCPUWorkerThreads*sizeof(Edge)); // 2 can count for vector's effect.
 		std::cout << "Each thread capacity is " << standardCapacity << " edges." << "\n";
@@ -136,7 +137,7 @@ int main( int argc, char ** argv ) {
 	try{
 
 		// Start the work.
-		bool fOutcome = sorted ?	GraphGen_sorted::GenerateGraph( nEdges, nVertices, a, b, c, nCPUWorkerThreads, outf, standardCapacity, allowEdgeToSelf, allowDuplicateEdges, directedGraph ) :
+		auto fOutcome = sorted ?	GraphGen_sorted::GenerateGraph( nEdges, nVertices, a, b, c, nCPUWorkerThreads, outf, standardCapacity, allowEdgeToSelf, allowDuplicateEdges, directedGraph ) :
 									GraphGen_notSorted::GenerateGraph( nEdges, nVertices, a, b, c, nCPUWorkerThreads, outf, standardCapacity, allowEdgeToSelf, allowDuplicateEdges, directedGraph );
 		if( fOutcome == EXIT_FAILURE ) {
 			std::cerr << "Exiting." << std::endl;
