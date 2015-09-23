@@ -48,5 +48,17 @@ creates a graph with a million edges and a hundred thousand vertices. Other acce
 		-Will the graph be directed (default:yes). To make it undirected: -undirected
 		-Usage of available system memory (default: 0.5 which means up to half of available RAM may be requested). E.g., -memUsage 0.9
 
-In addition to above arguments, there are a number of parameters internal to the program itself. They are accessible in `internal_config.hpp`. After applying modifications to this file, you obviously need to re-compile the program to see the effects. 
+In addition to above arguments, there are a number of parameters internal to the program itself. They are accessible in `internal_config.hpp`. After applying modifications to this file, you obviously need to re-compile the program to see the effects.
+
+
+Citing
+------------------
+```shell
+@MISC{PaRMAT,
+  author = "Khorasani, Farzad and Vora, Keval and Gupta, Rajiv",
+  title = "PaRMAT: A Parallel Generator for Large R-MAT Graphs",
+  year = "2015",
+  url = "https://github.com/farkhor/PaRMAT"
+}
+```
 
