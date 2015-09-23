@@ -52,56 +52,6 @@ void fill_up_edge_vector(
 
 }
 
-void eachThreadGenEdgesUsingMutex(
-		std::vector<Square>& rectangles,
-		std::mutex& writeMutex,
-		std::ofstream& outFile,
-		const unsigned long long standardCapacity,
-		const unsigned int threadIdx,
-		const unsigned int nThreads,
-		const double RMAT_a, const double RMAT_b, const double RMAT_c, const bool allowEdgeToSelf, const bool allowDuplicateEdges, const bool directedGraph
-		) {
-
-	std::vector<Edge> edgeVector;
-
-	std::random_device rd;
-	std::mt19937_64 gen(rd());
-	std::uniform_int_distribution<> dis;
-
-	for( unsigned int recIdx = threadIdx; recIdx < rectangles.size(); recIdx += nThreads ) {
-		auto& rec = rectangles.at(recIdx);
-		fill_up_edge_vector( std::ref(rec), std::ref(edgeVector), std::ref(dis), std::ref(gen), RMAT_a, RMAT_b, RMAT_c, allowEdgeToSelf, allowDuplicateEdges, directedGraph );
-		{
-			std::lock_guard<std::mutex> guard(writeMutex);
-			printEdgeGroup( std::ref(edgeVector), outFile );
-			progressBar();
-		}	// guard gets out-of-scope, unlocking the mutex upon destruction.
-		edgeVector.clear();	// clean the edge vector for the next round
-	}
-
-}
-
-void eachThreadGenEdgesUsingQueues(
-		threadsafe_queue<Square>& rec_queue,
-		threadsafe_queue< std::vector<Edge> >& EV_queue,
-		capacity_controller<long long>& capacityGate,
-		const double RMAT_a, const double RMAT_b, const double RMAT_c, const bool allowEdgeToSelf, const bool allowDuplicateEdges, const bool directedGraph
-		) {
-
-	std::random_device rd;
-	std::mt19937_64 gen(rd());
-	std::uniform_int_distribution<> dis;
-
-	Square rec;
-	while( rec_queue.try_pop(std::ref(rec)) != 0 ) {
-		capacityGate.accumulate( rec.getnEdges() );
-		std::vector<Edge> edgeVector;
-		fill_up_edge_vector( std::ref(rec), std::ref(edgeVector), std::ref(dis), std::ref(gen), RMAT_a, RMAT_b, RMAT_c, allowEdgeToSelf, allowDuplicateEdges, directedGraph );
-		EV_queue.push(std::move(edgeVector));
-	}
-
-}
-
 bool GraphGen_notSorted::GenerateGraph(
 		const unsigned long long nEdges,
 		const unsigned long long nVertices,
@@ -162,15 +112,28 @@ bool GraphGen_notSorted::GenerateGraph(
 
 		std::mutex writeMutex;
 		unsigned int nWorkerThreads = nCPUWorkerThreads <squares.size() ? nCPUWorkerThreads : squares.size();
+
+		auto eachThreadGenEdgesUsingMutexFunc = [&] ( unsigned int puId ) {
+			std::vector<Edge> edgeVector;
+
+			std::random_device rd;
+			std::mt19937_64 gen(rd());
+			std::uniform_int_distribution<> dis;
+
+			for( unsigned int recIdx = puId; recIdx < squares.size(); recIdx += nWorkerThreads ) {
+				auto& rec = squares.at( recIdx );
+				fill_up_edge_vector( std::ref(rec), std::ref(edgeVector), std::ref(dis), std::ref(gen), RMAT_a, RMAT_b, RMAT_c, allowEdgeToSelf, allowDuplicateEdges, directedGraph );
+				{
+					std::lock_guard<std::mutex> guard( writeMutex );
+					printEdgeGroup( std::ref(edgeVector), outFile );
+					progressBar();
+				}	// guard gets out-of-scope, unlocking the mutex upon destruction.
+				edgeVector.clear();	// clean the edge vector for the next round
+			}
+		};
+
 		for( unsigned int puIdx = 0; puIdx < nWorkerThreads; ++puIdx )
-			threads.push_back( std::thread( eachThreadGenEdgesUsingMutex,
-											std::ref(squares),
-											std::ref(writeMutex),
-											std::ref(outFile),
-											standardCapacity,
-											puIdx,
-											nWorkerThreads,
-											RMAT_a, RMAT_b, RMAT_c, allowEdgeToSelf, allowDuplicateEdges, directedGraph ) );
+			threads.push_back( std::thread( eachThreadGenEdgesUsingMutexFunc, puIdx ) );
 
 		std::for_each( threads.begin(), threads.end(), std::mem_fn(&std::thread::join) );
 
@@ -186,12 +149,22 @@ bool GraphGen_notSorted::GenerateGraph(
 
 		for( auto& rec: squares )
 			rec_queue.push(rec);
+
+		auto eachThreadGenEdgesUsingQueuesFunc = [&] {
+			std::random_device rd;
+			std::mt19937_64 gen(rd());
+			std::uniform_int_distribution<> dis;
+			Square rec;
+			while( rec_queue.try_pop(std::ref(rec)) != 0 ) {
+				capacityGate.accumulate( rec.getnEdges() );
+				std::vector<Edge> edgeVector;
+				fill_up_edge_vector( std::ref(rec), std::ref(edgeVector), std::ref(dis), std::ref(gen), RMAT_a, RMAT_b, RMAT_c, allowEdgeToSelf, allowDuplicateEdges, directedGraph );
+				EV_queue.push(std::move(edgeVector));
+			}
+		};
+
 		for( unsigned int puIdx = 0; puIdx < nCPUWorkerThreads; ++puIdx )
-					threads.push_back( std::thread( eachThreadGenEdgesUsingQueues,
-													std::ref(rec_queue),
-													std::ref(EV_queue),
-													std::ref(capacityGate),
-													RMAT_a, RMAT_b, RMAT_c, allowEdgeToSelf, allowDuplicateEdges, directedGraph ) );
+			threads.push_back( std::thread( eachThreadGenEdgesUsingQueuesFunc ) );
 
 		std::vector<Edge> poppedEV;
 		for( unsigned nWrittenEV = 0; nWrittenEV < squares.size(); ++nWrittenEV ) {
