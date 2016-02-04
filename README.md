@@ -54,6 +54,17 @@ In addition to above arguments, there are a number of parameters internal to the
 Citing
 ------------------
 ```shell
+@inproceedings{wsvr,
+ author = {Khorasani, Farzad and Gupta, Rajiv and Bhuyan, Laxmi N.},
+ title = {Scalable SIMD-Efficient Graph Processing on GPUs},
+ booktitle = {Proceedings of the 24th International Conference on Parallel Architectures and Compilation Techniques},
+ series = {PACT '15},
+ pages = {39--50},
+ year = {2015}
+}
+```
+
+```shell
 @MISC{PaRMAT,
   author = "Khorasani, Farzad and Vora, Keval and Gupta, Rajiv",
   title = "PaRMAT: A Parallel Generator for Large R-MAT Graphs",
