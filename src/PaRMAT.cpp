@@ -104,6 +104,10 @@ int main( int argc, char ** argv ) {
 		if( !outf.is_open() )
 			openFileToWrite( outf, "out.txt" );
 
+		// Avoiding very small regions which may cause incorrect results.
+		if( nEdges < 10000 )
+			nCPUWorkerThreads = 1;
+
 		if( nCPUWorkerThreads == 0 )	// If number of concurrent threads haven't specified by the user,
 			nCPUWorkerThreads = std::max( 1, static_cast<int>(std::thread::hardware_concurrency()) - 1 );	// try to manage their numbers automatically. If cannot determine, go single-threaded.
 
