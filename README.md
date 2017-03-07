@@ -64,12 +64,4 @@ Citing
 }
 ```
 
-```shell
-@MISC{PaRMAT,
-  author = "Khorasani, Farzad and Vora, Keval and Gupta, Rajiv",
-  title = "PaRMAT: A Parallel Generator for Large R-MAT Graphs",
-  year = "2015",
-  url = "https://github.com/farkhor/PaRMAT"
-}
-```
 
