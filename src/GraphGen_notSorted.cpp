@@ -145,7 +145,7 @@ bool GraphGen_notSorted::GenerateGraph(
 
 		threadsafe_queue<Square> rec_queue;
 		threadsafe_queue< std::vector<Edge> > EV_queue;
-		capacity_controller<long long> capacityGate(static_cast<long long>(standardCapacity), 0);
+		capacity_controller<long long> capacityGate(static_cast<long long>(standardCapacity * nCPUWorkerThreads), 0);
 
 		for( auto& rec: squares )
 			rec_queue.push(rec);
